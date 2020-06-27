@@ -1,0 +1,5 @@
+{
+  "nodeEnvironment": "development",
+
+  "mongoURI": "mongodb+srv://Hao123:contactkeeper@devconnector-49jki.mongodb.net/DevConnector?retryWrites=true&w=majority"
+}

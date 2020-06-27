@@ -3,7 +3,7 @@
 How to start:
 
 ```bash
-npm i express express-validator bcryptjs config gravatar jsonwebtoken mongoose request
+npm i express express-validator bcryptjs config gravatar jsonwebtoken mongoose request morgan colors
 ```
 
 1. `express`: web framework
