@@ -16,9 +16,15 @@ if (config.get("nodeEnvironment") === "development") {
   app.use(morgan("dev"));
 }
 
-app.use("/", (req, res, next) => {
+app.get("/", (req, res, next) => {
   res.send("API Running");
 });
+
+// Define routes
+app.use("/api/v1/users", require("./routes/users"));
+app.use("/api/v1/auth", require("./routes/auth"));
+app.use("/api/v1/posts", require("./routes/posts"));
+app.use("/api/v1/profile", require("./routes/profile"));
 
 const PORT = process.env.PORT || 5000;
 
