@@ -16,6 +16,7 @@ if (config.get("nodeEnvironment") === "development") {
   app.use(morgan("dev"));
 }
 
+// Default response when hitting the root URL
 app.get("/", (req, res, next) => {
   res.send("API Running");
 });
