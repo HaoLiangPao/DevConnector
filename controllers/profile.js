@@ -9,15 +9,13 @@ const { validationResult } = require("express-validator");
 // @desc         Get current user profile
 // @access       Private
 exports.getProfile = AsycnHandler(async (req, res, next) => {
-  // Set default empty profile
-  let profile = {};
-  // Get the profile from db
-  const exist = await Profile.findOne({ user: req.user.id });
-  // Populate user information when profile exists
-  if (exist) {
-    profile = await exist.populate("User", ["name", "avatar"]);
-  }
-  res.status(200).json({ success: true, data: profile });
+  // Get the profile from db, populate user information when profile exists
+  let profile = await Profile.findOne({ user: req.user.id }).populate({
+    path: "user",
+    select: "name avatar",
+  });
+  // Send {} if no profile found, send a populated one if profile exists
+  res.status(200).json({ success: true, data: profile ? profile : {} });
 });
 // @route        POST /api/v1/profile/
 // @desc         Create or Update a user profile
@@ -74,4 +72,15 @@ exports.createProfile = AsycnHandler(async (req, res, next) => {
     { new: true, upsert: true }
   );
   res.status(200).json({ success: true, data: profile });
+});
+// @route        GET /api/v1/profile
+// @desc         Get all profiles
+// @access       Public
+exports.getProfiles = AsycnHandler(async (req, res, next) => {
+  // Get the profile from db, populate the user with name and avatar info
+  let profiles = await Profile.find().populate({
+    path: "user",
+    select: "name avatar",
+  });
+  res.status(200).json({ success: true, data: profiles });
 });
