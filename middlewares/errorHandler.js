@@ -34,7 +34,7 @@ const errorHandler = (err, req, res, next) => {
   // Pass the status and error message through res
   res.status(error.statusCode || 500).json({
     success: false,
-    errors: error.message || "Server Error",
+    errors: [{ msg: error.message }] || "Server Error",
   });
 };
 

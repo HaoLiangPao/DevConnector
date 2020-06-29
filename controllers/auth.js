@@ -42,14 +42,6 @@ exports.register = AsyncHandler(async (req, res, next) => {
   // 5. Return jsonwebtoken
   SendTokenResponse(user, 201, res);
 });
-
-// @route        GET /api/v1/auth/me
-// @desc         Get current logged in user
-// @access       Private
-exports.getMe = AsycnHandler(async (req, res, next) => {
-  res.status(200).json({ success: true, data: req.user });
-});
-
 // @route        GET /api/v1/auth/login
 // @desc         Login a user
 // @access       Public
@@ -69,11 +61,17 @@ exports.login = AsycnHandler(async (req, res, next) => {
     );
   }
   // 2. Authenticate the password and email
-  if (!user.matchPassword(password)) {
+  if (!(await user.matchPassword(password))) {
     return next(new ErrorResponse("Invalid credentials", 401));
   }
   // 3. Return jsonwebtoken
   SendTokenResponse(user, 200, res);
+});
+// @route        GET /api/v1/auth/me
+// @desc         Get current logged in user
+// @access       Private
+exports.getMe = AsycnHandler(async (req, res, next) => {
+  res.status(200).json({ success: true, data: req.user });
 });
 
 // --- Helper Function ---
