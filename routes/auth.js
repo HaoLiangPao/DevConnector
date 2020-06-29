@@ -6,7 +6,7 @@ const { check } = require("express-validator");
 const { protect } = require("../middlewares/auth");
 
 // Import controller actions
-const { getMe, register } = require("../controllers/auth");
+const { getMe, register, login } = require("../controllers/auth");
 
 // Defin routes
 router.get("/me", protect, getMe);
@@ -21,6 +21,17 @@ router.post(
     ).isLength({ min: 6 }),
   ],
   register
+);
+router.post(
+  "/login",
+  [
+    check("email", "Please include a valid email").isEmail(),
+    check(
+      "password",
+      "Please enter a password with 6 or more characters"
+    ).isLength({ min: 6 }),
+  ],
+  login
 );
 
 module.exports = router;
