@@ -15,6 +15,7 @@ connectDB();
 // -- Middleware Function
 // Body parser
 app.use(express.json({ extended: false }));
+// Dev logger
 if (config.get("nodeEnvironment") === "development") {
   app.use(morgan("dev"));
 }

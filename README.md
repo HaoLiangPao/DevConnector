@@ -27,3 +27,5 @@ npm i express express-validator bcryptjs config gravatar jsonwebtoken mongoose r
 9. [`morgan`](https://github.com/expressjs/morgan): a third party middleware function working as a logger
 
 10. [`colors`](https://github.com/marak/colors.js/): a third party package which can change color and styles of logging message in node.js console
+
+11. [`normalize`](): Normalize the user input to make it easier for URL
