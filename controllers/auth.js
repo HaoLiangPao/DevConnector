@@ -5,8 +5,9 @@ const ErrorResponse = require("../utils/ErrorResponse");
 const User = require("../models/User");
 
 const { validationResult } = require("express-validator");
+const AsycnHandler = require("../middlewares/AsyncHandler");
 
-// @route        POST /api/v1/users
+// @route        POST /api/v1/auth/register
 // @desc         Register a user
 // @access       Public
 exports.register = AsyncHandler(async (req, res, next) => {
@@ -45,6 +46,15 @@ exports.register = AsyncHandler(async (req, res, next) => {
   SendTokenResponse(user, 201, res);
 });
 
+// @route        GET /api/v1/auth/me
+// @desc         Get current logged in user
+// @access       Public
+exports.getMe = AsycnHandler(async (req, res, next) => {
+  res.status(200).json({ success: true, data: req.user });
+});
+
+// --- Helper Function ---
+// Generate JWT token and send it back within a response
 const SendTokenResponse = async (user, statusCode, res) => {
   // Generate the jwt token according to the user instance
   const token = user.getSignedToken();

@@ -1,12 +1,26 @@
 const express = require("express");
-
 const router = express.Router();
+const { check } = require("express-validator");
 
-// @route        GET /api/v1/auth
-// @desc         Test route
-// @access       Public
-router.get("/", (req, res) => {
-  res.send("auth route");
-});
+// --- Middleware function ---
+const { protect } = require("../middlewares/auth");
+
+// Import controller actions
+const { getMe, register } = require("../controllers/auth");
+
+// Defin routes
+router.get("/me", protect, getMe);
+router.post(
+  "/register",
+  [
+    check("name", "Name is required").not().isEmpty(),
+    check("email", "Please include a valid email").isEmail(),
+    check(
+      "password",
+      "Please enter a password with 6 or more characters"
+    ).isLength({ min: 6 }),
+  ],
+  register
+);
 
 module.exports = router;
