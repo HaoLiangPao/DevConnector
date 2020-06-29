@@ -12,6 +12,8 @@ const app = express();
 connectDB();
 
 // -- Middleware Function
+// Body parser
+app.use(express.json({ extended: false }));
 if (config.get("nodeEnvironment") === "development") {
   app.use(morgan("dev"));
 }
