@@ -5,6 +5,7 @@ const morgan = require("morgan");
 
 // Customized modules
 const connectDB = require("./config/db");
+const errorHandler = require("./middlewares/errorHandler");
 
 // Initialize the app
 const app = express();
@@ -28,6 +29,8 @@ app.use("/api/v1/users", require("./routes/users"));
 app.use("/api/v1/auth", require("./routes/auth"));
 app.use("/api/v1/posts", require("./routes/posts"));
 app.use("/api/v1/profile", require("./routes/profile"));
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
