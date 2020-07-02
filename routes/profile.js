@@ -13,6 +13,7 @@ const {
   deleteExperience,
   addEducation,
   deleteEducation,
+  getGithub,
 } = require("../controllers/profile");
 const { protect } = require("../middlewares/auth");
 const { check } = require("express-validator");
@@ -62,5 +63,8 @@ router.route("/education").post(
   addEducation
 );
 router.route("/education/:edu_id").delete(protect, deleteEducation);
+
+// Get github profile
+router.route("/github/:username").get(getGithub);
 
 module.exports = router;

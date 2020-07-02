@@ -3,6 +3,8 @@ const ErrorResponse = require("../utils/ErrorResponse");
 const Profile = require("../models/Profile");
 const User = require("../models/User");
 const normalize = require("normalize-url");
+const request = require("request");
+const config = require("config");
 
 const { validationResult } = require("express-validator");
 
@@ -266,5 +268,34 @@ exports.deleteEducation = AsycnHandler(async (req, res, next) => {
     message: "education Deleted",
     remaining_count: profile.education.length,
     remaining_education: profile.education,
+  });
+});
+// @route        GET /api/v1/profile/github/:username
+// @desc         Get user repos from Github
+// @access       Public
+exports.getGithub = AsycnHandler(async (req, res, next) => {
+  const options = {
+    uri: `https://api.github.com/users/${
+      req.params.username
+    }/repos?per_page=5&sort=created:asc&client_id=${config.get(
+      "githubClientID"
+    )}&client_secret=${config.get("githubSecret")}`,
+    method: "GET",
+    headers: { "user-agent": "node.js" },
+  };
+  // External requests to github API
+  request(options, (error, response, body) => {
+    if (error) {
+      return next(new ErrorResponse(error, 500));
+    }
+    if (response.statusCode !== 200) {
+      return next(
+        new ErrorResponse(
+          `No Github profile found with username of ${req.params.username}`,
+          404
+        )
+      );
+    }
+    res.status(200).json({ success: true, data: JSON.parse(body) });
   });
 });
