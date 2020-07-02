@@ -161,3 +161,35 @@ exports.addExperience = AsycnHandler(async (req, res, next) => {
   }
   res.status(200).json({ success: true, data: profile });
 });
+// @route        DELETE /api/v1/profile/experience/:exp_id
+// @desc         Delete working experience of the logged in user
+// @access       Private
+exports.deleteExperience = AsycnHandler(async (req, res, next) => {
+  // Todo - remove users posts
+  const profile = await Profile.findOne({ user: req.user.id });
+  if (!profile) {
+    return next(
+      new ErrorResponse(
+        `No experience found with id of ${req.params.exp_id}`,
+        404
+      )
+    );
+  }
+  const removeIndex = profile.experience
+    .map((exp) => exp.id)
+    .indexOf(req.params.exp_id);
+  // Check if the id exists
+  if (removeIndex === -1) {
+    return next(
+      new ErrorResponse(`No experience found with id of ${req.params.exp_id}`)
+    );
+  }
+  profile.experience.splice(removeIndex, 1);
+  await profile.save();
+  res.status(200).json({
+    success: true,
+    message: "Experience Deleted",
+    remaining_count: profile.experience.length,
+    remaining_experience: profile.experience,
+  });
+});

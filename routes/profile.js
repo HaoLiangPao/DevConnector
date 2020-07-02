@@ -10,6 +10,7 @@ const {
   getUserProfile,
   deleteProfile,
   addExperience,
+  deleteExperience,
 } = require("../controllers/profile");
 const { protect } = require("../middlewares/auth");
 const { check } = require("express-validator");
@@ -42,5 +43,6 @@ router
     ],
     addExperience
   );
+router.route("/experience/:exp_id").delete(protect, deleteExperience);
 
 module.exports = router;
