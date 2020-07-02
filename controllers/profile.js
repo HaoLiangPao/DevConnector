@@ -1,6 +1,7 @@
 const AsycnHandler = require("../middlewares/AsyncHandler");
 const ErrorResponse = require("../utils/ErrorResponse");
 const Profile = require("../models/Profile");
+const User = require("../models/User");
 const normalize = require("normalize-url");
 
 const { validationResult } = require("express-validator");
@@ -82,5 +83,81 @@ exports.getProfiles = AsycnHandler(async (req, res, next) => {
     path: "user",
     select: "name avatar",
   });
-  res.status(200).json({ success: true, data: profiles });
+  res
+    .status(200)
+    .json({ success: true, count: profiles.length, data: profiles });
+});
+// @route        GET /api/v1/profile/user/:user_id
+// @desc         Get profile by user ID
+// @access       Public
+exports.getUserProfile = AsycnHandler(async (req, res, next) => {
+  // Check if the userid is valid
+  const user = await User.findById(req.params.user_id);
+  if (!user) {
+    return next(
+      new ErrorResponse(`No user found with id of ${req.params.user_id}`, 404)
+    );
+  }
+  // Get the profile from db, populate the user with name and avatar info
+  let profile = await Profile.findOne({ user: req.params.user_id }).populate({
+    path: "user",
+    select: "name avatar",
+  });
+  // No error handlling, just send back an empty object
+  res
+    .status(200)
+    .json({ success: true, data: profile === null ? {} : profile });
+});
+// @route        DELETE /api/v1/profile
+// @desc         Delete profile and corresponding user and posts
+// @access       Private
+exports.deleteProfile = AsycnHandler(async (req, res, next) => {
+  // Todo - remove users posts
+
+  // Remove profile
+  await Profile.findOneAndRemove({ user: req.user.id });
+  // Remove user
+  await User.findOneAndRemove({ _id: req.user.id });
+  res.status(200).json({ success: true, data: {} });
+});
+// @route        PUT /api/v1/profile/experience
+// @desc         Add profile experience
+// @access       Private
+exports.addExperience = AsycnHandler(async (req, res, next) => {
+  // Check validator errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  let profileFind = await Profile.findOne({ user: req.user.id });
+  let profileFindOne = await Profile.find({ user: req.user.id });
+
+  console.log("Profile find");
+  console.log(profileFind);
+  console.log("Profile Findone");
+  console.log(profileFindOne);
+
+  let profile = await Profile.findOne({ user: req.user.id }); // findone will return [] for experi
+  const { title, company, location, from, to, current, description } = req.body;
+  const newExp = {
+    title,
+    company,
+    location,
+    from,
+    to,
+    current,
+    description,
+  };
+  // Add the experience to the beginning of the experience attribute
+  if (profile.experience !== undefined) {
+    profile.experience.unshift(newExp);
+    await profile.save();
+  } else {
+    profile = await Profile.findOneAndUpdate({ user: req.user.id }, newExp, {
+      new: true,
+      runValidators: true,
+    });
+  }
+  res.status(200).json({ success: true, data: profile });
 });

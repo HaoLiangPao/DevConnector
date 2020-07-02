@@ -4,5 +4,5 @@
   "mongoURI": "mongodb+srv://Hao123:contactkeeper@devconnector-49jki.mongodb.net/DevConnector?retryWrites=true&w=majority",
 
   "JWT_SECRET": "24a769400b8f4037566f1350d0c2fc59c7457c836141f9b3599748a521befc858a0cd92745936d069b498c541a29b5c4a10f860d44830492623ddf0d9522abc7",
-  "JWT_EXPIRE": "360000"
+  "JWT_EXPIRE": "3600000"
 }

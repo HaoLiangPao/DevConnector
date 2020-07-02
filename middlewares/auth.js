@@ -14,6 +14,7 @@ exports.protect = AsycnHandler(async (req, res, next) => {
     // Verify the token
     const payload = jwt.verify(token, config.get("JWT_SECRET"));
     const user = await User.findById(payload.id);
+    // Take care of No user existed, and wrong payload user id
     if (!user) {
       return next(
         new ErrorResponse("Not authorized to access this route", 401)

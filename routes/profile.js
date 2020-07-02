@@ -7,6 +7,9 @@ const {
   getProfile,
   createProfile,
   getProfiles,
+  getUserProfile,
+  deleteProfile,
+  addExperience,
 } = require("../controllers/profile");
 const { protect } = require("../middlewares/auth");
 const { check } = require("express-validator");
@@ -23,6 +26,21 @@ router
     ],
     createProfile
   )
-  .get(getProfiles);
+  .get(getProfiles)
+  .delete(protect, deleteProfile);
+
+router.route("/user/:user_id").get(getUserProfile);
+
+router
+  .route("/experience")
+  .put(
+    [
+      protect,
+      check("title", "Title is required").not().isEmpty(),
+      check("company", "Company is required"),
+      check("from", "From date is required"),
+    ],
+    addExperience
+  );
 
 module.exports = router;
