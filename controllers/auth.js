@@ -54,7 +54,7 @@ exports.login = AsycnHandler(async (req, res, next) => {
   // Get all input information
   const { email, password } = req.body;
   // 1. See if the user exists
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("+password");
   if (!user) {
     return next(
       new ErrorResponse(`User with email of ${email} is not registered`, 400)

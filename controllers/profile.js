@@ -130,15 +130,13 @@ exports.addExperience = AsycnHandler(async (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let profileFind = await Profile.findOne({ user: req.user.id });
-  let profileFindOne = await Profile.find({ user: req.user.id });
-
-  console.log("Profile find");
-  console.log(profileFind);
-  console.log("Profile Findone");
-  console.log(profileFindOne);
-
-  let profile = await Profile.findOne({ user: req.user.id }); // findone will return [] for experi
+  // findone will return [...] for experience where findbyid return [object]
+  let profile = await Profile.findOne({ user: req.user.id });
+  if (!profile) {
+    return next(
+      new ErrorResponse(`Please add a profile before adding experience`, 404)
+    );
+  }
   const { title, company, location, from, to, current, description } = req.body;
   const newExp = {
     title,
@@ -191,5 +189,82 @@ exports.deleteExperience = AsycnHandler(async (req, res, next) => {
     message: "Experience Deleted",
     remaining_count: profile.experience.length,
     remaining_experience: profile.experience,
+  });
+});
+// @route        PUT /api/v1/profile/education
+// @desc         Add profile education
+// @access       Private
+exports.addEducation = AsycnHandler(async (req, res, next) => {
+  // Check validator errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  // @TO-DO: Find the difference between findOne() and find()
+  let profileFind = await Profile.findOne({ user: req.user.id });
+  let profileFindOne = await Profile.find({ user: req.user.id });
+
+  let profile = await Profile.findOne({ user: req.user.id }); // findone will return [] for experi
+  const {
+    school,
+    degree,
+    fieldofstudy,
+    from,
+    to,
+    current,
+    description,
+  } = req.body;
+
+  const newEdu = {
+    school,
+    degree,
+    fieldofstudy,
+    from,
+    to,
+    current,
+    description,
+  };
+  // Add the experience to the beginning of the experience attribute
+  if (profile.education !== undefined) {
+    profile.education.unshift(newEdu);
+    await profile.save();
+  } else {
+    profile = await Profile.findOneAndUpdate({ user: req.user.id }, newExp, {
+      new: true,
+      runValidators: true,
+    });
+  }
+  res.status(200).json({ success: true, data: profile });
+});
+// @route        DELETE /api/v1/profile/education/:edu_id
+// @desc         Delete working education of the logged in user
+// @access       Private
+exports.deleteEducation = AsycnHandler(async (req, res, next) => {
+  // Todo - remove users posts
+  const profile = await Profile.findOne({ user: req.user.id });
+  if (!profile) {
+    return next(
+      new ErrorResponse(
+        `No education found with id of ${req.params.edu_id}`,
+        404
+      )
+    );
+  }
+  const removeIndex = profile.education
+    .map((edu) => edu.id)
+    .indexOf(req.params.edu_id);
+  // Check if the id exists
+  if (removeIndex === -1) {
+    return next(
+      new ErrorResponse(`No education found with id of ${req.params.edu_id}`)
+    );
+  }
+  profile.education.splice(removeIndex, 1);
+  await profile.save();
+  res.status(200).json({
+    success: true,
+    message: "education Deleted",
+    remaining_count: profile.education.length,
+    remaining_education: profile.education,
   });
 });

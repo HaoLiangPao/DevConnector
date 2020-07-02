@@ -11,12 +11,13 @@ const {
   deleteProfile,
   addExperience,
   deleteExperience,
+  addEducation,
+  deleteEducation,
 } = require("../controllers/profile");
 const { protect } = require("../middlewares/auth");
 const { check } = require("express-validator");
 
 // Define routes
-router.get("/me", protect, getProfile);
 router
   .route("/")
   .post(
@@ -30,11 +31,13 @@ router
   .get(getProfiles)
   .delete(protect, deleteProfile);
 
+router.get("/me", protect, getProfile);
 router.route("/user/:user_id").get(getUserProfile);
 
+// Adding and deleting experience section
 router
   .route("/experience")
-  .put(
+  .post(
     [
       protect,
       check("title", "Title is required").not().isEmpty(),
@@ -44,5 +47,20 @@ router
     addExperience
   );
 router.route("/experience/:exp_id").delete(protect, deleteExperience);
+// Adding and deleting education section
+router.route("/education").post(
+  [
+    protect,
+    check("school", "School is required").not().isEmpty(),
+    check("degree", "Degree is required").not().isEmpty(),
+    check("fieldofstudy", "Field of study is required").not().isEmpty(),
+    check("from", "From date is required and needs to be from the past")
+      .not()
+      .isEmpty()
+      .custom((value, { req }) => (req.body.to ? value < req.body.to : true)),
+  ],
+  addEducation
+);
+router.route("/education/:edu_id").delete(protect, deleteEducation);
 
 module.exports = router;
